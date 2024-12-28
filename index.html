@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Senha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Estilos básicos */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            transition: background-color 0.3s;
+        }
+
+        .language-selector {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .language-selector label {
+            margin-right: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .language-selector select {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .password-display {
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #f7f7f7;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .options label {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .options input, .options select {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .generate-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .generate-btn:hover {
+            background-color: #45a049;
+        }
+
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .next-btn {
+            background-color: #fd7e14;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .next-btn:hover {
+            background-color: #af682e;
+        }
+
+        .info {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .theme-toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .password-strength {
+            margin-bottom: 20px;
+        }
+
+        #passwordStrengthBar {
+            height: 10px;
+            background: #ddd;
+        }
+
+        /* Cores para os diferentes níveis de força */
+        #passwordStrengthBar.fraco {
+            background-color: #ff4d4d;
+        }
+
+        #passwordStrengthBar.medio {
+            background-color: #ffcc00;
+        }
+
+        #passwordStrengthBar.forte {
+            background-color: #33cc33;
+        }
+
+        #passwordStrengthBar.muito-forte {
+            background-color: #00ff22;
+        }
+
+        /* Tema Claro */
+        body.light-theme {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container.light-theme {
+            background-color: white;
+        }
+
+        .password-display.light-theme {
+            background-color: #f7f7f7;
+        }
+
+        /* Tema Escuro */
+        body.dark-theme {
+            background-color: #333;
+            color: #f4f4f4;
+        }
+
+        .container.dark-theme {
+            background-color: #444;
+        }
+
+        .password-display.dark-theme {
+            background-color: #555;
+        }
+
+        .theme-toggle-btn {
+            background-color: #000000;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+
+        /* Aviso de senha fraca */
+        .weak-password {
+            color: #ff4d4d;
+            font-weight: bold;
+        }
+
+        /* Novo estilo para senhas seguras */
+        .strong-password {
+            color: #33cc33;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="light-theme">
+
+<div class="container">
+    <!-- Alternância de Tema -->
+    <div class="theme-toggle">
+        <button class="theme-toggle-btn" id="themeToggleBtn">Alternar para Tema Escuro</button>
+    </div>
+
+    <!-- Seletor de Idioma -->
+    <div class="language-selector">
+        <label for="language">Idioma:</label>
+        <select id="language">
+            <option value="pt">Português</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+        </select>
+    </div>
+    <h1>Gerador de Senha</h1>
+
+    <!-- Display da senha gerada -->
+    <div id="passwordDisplay" class="password-display">Sua senha aparecerá aqui</div>
+
+    <!-- Opções de personalização -->
+    <div class="options">
+        <label for="length">Comprimento da Senha:</label>
+        <input type="number" id="length" value="16" min="8" max="32">
+
+        <label for="includeUpperCase">Incluir letras maiúsculas</label>
+        <input type="checkbox" id="includeUpperCase" checked>
+
+        <label for="includeNumbers">Incluir números</label>
+        <input type="checkbox" id="includeNumbers" checked>
+
+        <label for="includeSpecialChars">Incluir caracteres especiais</label>
+        <input type="checkbox" id="includeSpecialChars" checked>
+
+        <label for="excludeChars">Excluir caracteres específicos</label>
+        <input type="text" id="excludeChars" placeholder="Ex: 0, O, I">
+
+        <label for="keyword">Incluir palavra-chave</label>
+        <input type="text" id="keyword" placeholder="Digite uma palavra">
+    </div>
+
+    <!-- Barra de Força da Senha -->
+    <div class="password-strength">
+        <label>Força da Senha:</label>
+        <div id="passwordStrengthBar"></div>
+        <span id="strengthText"></span>
+    </div>
+
+    <!-- Botão para gerar senha -->
+    <button class="generate-btn" id="generateBtn">
+        Gerar Senha <i class="fas fa-key"></i>
+    </button>
+  
+    <!-- Botão para copiar a senha -->
+    <button class="copy-btn" id="copyBtn">
+        Copiar Senha <i class="fas fa-copy"></i>
+    </button>
+  
+    <!-- Botão de Proximo -->
+    <a href="index2.html">
+        <button class="next-btn">
+        Exibir senha <i class="fas fa-eye"></i>
+        </button>
+    </a>
+  
+    <!-- Informação de uso -->
+    <div class="info">
+        <p>Use a senha gerada em sites seguros e nunca compartilhe com outros!</p>
+    </div>
+
+<script>
+    // Textos em diferentes idiomas
+    const translations = {
+        pt: {
+            title: "Gerador de Senha",
+            lengthLabel: "Comprimento da Senha:",
+            includeUpperCase: "Incluir letras maiúsculas",
+            includeNumbers: "Incluir números",
+            includeSpecialChars: "Incluir caracteres especiais",
+            excludeChars: "Excluir caracteres específicos",
+            keyword: "Incluir palavra-chave",
+            strengthLabel: "Força da Senha:",
+            generateBtn: "Gerar Senha",
+            copyBtn: "Copiar Senha",
+            info: "Use a senha gerada em sites seguros e nunca compartilhe com outros!",
+            themeToggle: "Alternar para Tema Escuro",
+            strengthLevels: {
+                weak: "Senha fraca!",
+                medium: "Senha média.",
+                strong: "Senha forte!",
+                veryStrong: "Senha muito forte!",
+            },
+        },
+        en: {
+            title: "Password Generator",
+            lengthLabel: "Password Length:",
+            includeUpperCase: "Include Uppercase Letters",
+            includeNumbers: "Include Numbers",
+            includeSpecialChars: "Include Special Characters",
+            excludeChars: "Exclude Specific Characters",
+            keyword: "Include Keyword",
+            strengthLabel: "Password Strength:",
+            generateBtn: "Generate Password",
+            copyBtn: "Copy Password",
+            info: "Use the generated password on secure sites and never share it with others!",
+            themeToggle: "Switch to Dark Theme",
+            strengthLevels: {
+                weak: "Weak password!",
+                medium: "Medium password.",
+                strong: "Strong password!",
+                veryStrong: "Very strong password!",
+            },
+        },
+        es: {
+            title: "Generador de Contraseñas",
+            lengthLabel: "Longitud de la Contraseña:",
+            includeUpperCase: "Incluir Letras Mayúsculas",
+            includeNumbers: "Incluir Números",
+            includeSpecialChars: "Incluir Caracteres Especiales",
+            excludeChars: "Excluir Caracteres Específicos",
+            keyword: "Incluir Palabra Clave",
+            strengthLabel: "Fortaleza de la Contraseña:",
+            generateBtn: "Generar Contraseña",
+            copyBtn: "Copiar Contraseña",
+            info: "¡Use la contraseña generada en sitios seguros y nunca la comparta con otros!",
+            themeToggle: "Cambiar a Tema Oscuro",
+            strengthLevels: {
+                weak: "¡Contraseña débil!",
+                medium: "Contraseña media.",
+                strong: "¡Contraseña fuerte!",
+                veryStrong: "¡Contraseña muy fuerte!",
+            },
+        },
+    };
+
+    // Função para atualizar o idioma
+    function updateLanguage() {
+        const selectedLanguage = document.getElementById('language').value;
+        const texts = translations[selectedLanguage];
+
+        document.querySelector('h1').textContent = texts.title;
+        document.querySelector('label[for="length"]').textContent = texts.lengthLabel;
+        document.querySelector('label[for="includeUpperCase"]').textContent = texts.includeUpperCase;
+        document.querySelector('label[for="includeNumbers"]').textContent = texts.includeNumbers;
+        document.querySelector('label[for="includeSpecialChars"]').textContent = texts.includeSpecialChars;
+        document.querySelector('label[for="excludeChars"]').textContent = texts.excludeChars;
+        document.querySelector('label[for="keyword"]').textContent = texts.keyword;
+        document.querySelector('.password-strength label').textContent = texts.strengthLabel;
+        document.getElementById('generateBtn').textContent = texts.generateBtn;
+        document.getElementById('copyBtn').innerHTML = `${texts.copyBtn} <i class="fas fa-copy"></i>`;
+        document.querySelector('.info p').textContent = texts.info;
+        document.getElementById('themeToggleBtn').textContent = texts.themeToggle;
+    }
+
+    // Adicionar evento ao seletor de idioma
+    document.getElementById('language').addEventListener('change', updateLanguage);
+
+    // Inicializar com o idioma padrão
+    updateLanguage();
+    
+    // Função para gerar a senha
+    function generatePassword() {
+        const length = document.getElementById('length').value;
+        const includeUpperCase = document.getElementById('includeUpperCase').checked;
+        const includeNumbers = document.getElementById('includeNumbers').checked;
+        const includeSpecialChars = document.getElementById('includeSpecialChars').checked;
+        const excludeChars = document.getElementById('excludeChars').value.split(',').map(c => c.trim());
+        const keyword = document.getElementById('keyword').value;
+
+        const lowerCaseChars = 'abcdefghijklmnopqrstuvwxyz';
+        const upperCaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const numbers = '0123456789';
+        const specialChars = '!@#$%^&*()-_=+[]{}|;:,.<>?/';
+
+        let characters = lowerCaseChars;
+        if (includeUpperCase) characters += upperCaseChars;
+        if (includeNumbers) characters += numbers;
+        if (includeSpecialChars) characters += specialChars;
+
+        // Excluir caracteres específicos
+        characters = characters.split('').filter(char => !excludeChars.includes(char)).join('');
+
+        let password = '';
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            password += characters[randomIndex];
+        }
+
+        // Adicionar a palavra-chave, se houver
+        if (keyword) {
+            password = keyword + password;
+        }
+
+        // Exibe a senha gerada
+        document.getElementById('passwordDisplay').textContent = password;
+
+        // Atualizar a força da senha
+        updatePasswordStrength(password);
+    }
+
+    // Função para calcular e atualizar a força da senha
+    function updatePasswordStrength(password) {
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        const strengthText = document.getElementById('strengthText');
+        let strength = 0;
+        let strengthLevel = "";
+
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+        switch (strength) {
+            case 0:
+                strengthBar.style.width = '0%';
+                strengthLevel = "Fraco";
+                strengthBar.className = "fraco";
+                strengthText.textContent = "Senha muito fraca!";
+                break;
+            case 1:
+                strengthBar.style.width = '25%';
+                strengthLevel = "Fraco";
+                strengthBar.className = "fraco";
+                strengthText.textContent = "Senha fraca!";
+                break;
+            case 2:
+                strengthBar.style.width = '50%';
+                strengthLevel = "Médio";
+                strengthBar.className = "medio";
+                strengthText.textContent = "Senha média.";
+                break;
+            case 3:
+                strengthBar.style.width = '75%';
+                strengthLevel = "Forte";
+                strengthBar.className = "forte";
+                strengthText.textContent = "Senha forte!";
+                break;
+            case 4:
+                strengthBar.style.width = '100%';
+                strengthLevel = "Muito Forte";
+                strengthBar.className = "muito-forte";
+                strengthText.textContent = "Senha muito forte!";
+                break;
+        }
+    }
+
+    // Função para copiar a senha para a área de transferência
+    function copyPassword() {
+        const password = document.getElementById('passwordDisplay').textContent;
+        navigator.clipboard.writeText(password).then(() => {
+            alert('Senha copiada para a área de transferência!');
+        }).catch(err => {
+            alert('Falha ao copiar a senha: ' + err);
+        });
+    }
+
+    // Alternar entre temas claro e escuro
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        const body = document.body;
+        const container = document.querySelector('.container');
+        const passwordDisplay = document.querySelector('.password-display');
+
+        body.classList.toggle('dark-theme');
+        body.classList.toggle('light-theme');
+        container.classList.toggle('dark-theme');
+        container.classList.toggle('light-theme');
+        passwordDisplay.classList.toggle('dark-theme');
+        passwordDisplay.classList.toggle('light-theme');
+
+        const isDarkTheme = body.classList.contains('dark-theme');
+        document.getElementById('themeToggleBtn').textContent = isDarkTheme ? 'Alternar para Tema Claro' : 'Alternar para Tema Escuro';
+    });
+
+    // Adicionar eventos aos botões
+    document.getElementById('generateBtn').addEventListener('click', generatePassword);
+    document.getElementById('copyBtn').addEventListener('click', copyPassword);
+</script>
+
+</body>
+</html>

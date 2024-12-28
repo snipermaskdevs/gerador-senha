@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização de Senha Teste</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, color 0.3s;
+            width: 300px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .theme-toggle-btn {
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #28a745;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: #218838;
+        }
+
+        .lang-select {
+            margin-top: 20px;
+            padding: 5px;
+            width: 100%;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .back-btn:hover {
+            background-color: #c82333;
+        }
+
+        .back-btn span {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Tema Escuro */
+        .dark-theme {
+            background-color: #333;
+            color: white;
+        }
+
+        .dark-theme .container {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="titulo">Teste de Senha</h1> <!-- Título dinâmico -->
+        <label for="senha" id="label-senha">Senha:</label>
+        <input type="password" id="senha" placeholder="Digite sua senha">
+        <button id="toggleSenha">Exibir</button>
+
+        <button class="theme-toggle-btn" id="toggleTheme">Tema Escuro</button>
+
+        <select class="lang-select" id="languageSelector">
+            <option value="pt-br">Português</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+        </select>
+
+        <!-- Botão de Voltar -->
+        <a href="index.html">
+        <button class="back-btn" onclick="window.history.back()">Voltar</button>
+    </div>
+
+    <script>
+        window.onload = () => {
+            const theme = localStorage.getItem("theme");
+            const language = localStorage.getItem("language");
+    
+            // Verifica se há uma preferência de tema salva e aplica
+            if (theme) {
+                document.body.classList.add(theme);
+            }
+            
+            // Verifica se há uma preferência de idioma salva e aplica
+            if (language) {
+                document.getElementById("languageSelector").value = language;
+                changeLanguage(language);
+            }
+        };
+    
+        // Função para alternar entre os temas claro e escuro
+        document.getElementById("toggleTheme").addEventListener("click", function() {
+            document.body.classList.toggle("dark-theme");
+    
+            // Salva o tema atual no localStorage
+            const currentTheme = document.body.classList.contains("dark-theme") ? "dark-theme" : "";
+            localStorage.setItem("theme", currentTheme);
+    
+            // Alterar o texto do botão conforme o tema e idioma
+            updateThemeButtonText();
+        });
+    
+        // Função para alternar o idioma
+        const translations = {
+            "pt-br": {
+                "titulo": "Teste de Senha",
+                "label-senha": "Senha:",
+                "toggleSenha": "Exibir",
+                "toggleTheme": "Tema Escuro"
+            },
+            "en": {
+                "titulo": "Password Test",
+                "label-senha": "Password:",
+                "toggleSenha": "Show",
+                "toggleTheme": "Dark Theme"
+            },
+            "es": {
+                "titulo": "Prueba de Contraseña",
+                "label-senha": "Contraseña:",
+                "toggleSenha": "Mostrar",
+                "toggleTheme": "Tema Oscuro"
+            }
+        };
+    
+        document.getElementById("languageSelector").addEventListener("change", function() {
+            const selectedLanguage = this.value;
+            localStorage.setItem("language", selectedLanguage);
+            changeLanguage(selectedLanguage);
+        });
+    
+        function changeLanguage(language) {
+            document.getElementById("label-senha").textContent = translations[language]["label-senha"];
+            document.getElementById("toggleSenha").textContent = translations[language]["toggleSenha"];
+            document.getElementById("titulo").textContent = translations[language]["titulo"];  // Alterando o título
+            updateThemeButtonText(language);
+        }
+    
+        function updateThemeButtonText(language) {
+            const themeButton = document.getElementById("toggleTheme");
+            const currentLanguage = language || localStorage.getItem("language") || "pt-br";
+            const currentTheme = document.body.classList.contains("dark-theme") ? "dark-theme" : "";
+    
+            // Atualiza o texto do botão com base no tema e no idioma
+            if (currentTheme === "dark-theme") {
+                themeButton.textContent = translations[currentLanguage]["toggleTheme"];
+            } else {
+                themeButton.textContent = translations[currentLanguage]["toggleTheme"];
+            }
+        }
+    
+        // Função para alternar a visibilidade da senha
+        document.getElementById("toggleSenha").addEventListener("click", function() {
+            var senhaInput = document.getElementById("senha");
+            var toggleButton = document.getElementById("toggleSenha");
+    
+            if (senhaInput.type === "password") {
+                senhaInput.type = "text";
+                toggleButton.textContent = "Ocultar";
+            } else {
+                senhaInput.type = "password";
+                toggleButton.textContent = "Exibir";
+            }
+        });
+    </script>           
+
+</body>
+</html>
